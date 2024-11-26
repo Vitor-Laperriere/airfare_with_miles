@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Flight Miles Search</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+</head>
+
+<body class="container">
+    <h1 class="mt-5">Search Flights Redeemable with Miles</h1>
+
+    {% if error_message %}
+        <div class="alert alert-danger">{{ error_message }}</div>
+    {% endif %}
+
+    <form method="post" class="mt-4">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">Search</button>
+    </form>
+
+    {% if flights %}
+        <h2 class="mt-5">Available Flights:</h2>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Airline</th>
+                    <th>Departure Time</th>
+                    <th>Arrival Time</th>
+                    <th>Duration (Hours)</th>
+                    <th>Miles Required</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for flight in flights %}
+                    <tr>
+                        <td>{{ flight.airline }}</td>
+                        <td>{{ flight.departure_time }}</td>
+                        <td>{{ flight.arrival_time }}</td>
+                        <td>{{ flight.duration }}h {{ flight.duration_minutes }}m</td>
+                        <td>{{ flight.baseMiles }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+</body>
+</html>
