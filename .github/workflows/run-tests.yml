@@ -28,8 +28,10 @@ jobs:
 
     - name: Run migrations
       run: |
+        cd tickets_with_miles
         python manage.py migrate
 
     - name: Run tests
       run: |
+        cd tickets_with_miles
         python manage.py test
