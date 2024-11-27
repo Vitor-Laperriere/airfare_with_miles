@@ -3,6 +3,17 @@
 <head>
     <title>Flight Miles Search</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            flatpickr("input[type='date']", {
+                minDate: "today",
+                maxDate: new Date().fp_incr(329)
+            });
+        });
+    </script>
+    
 </head>
 
 <body class="container">
