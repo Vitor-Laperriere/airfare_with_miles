@@ -1,4 +1,3 @@
-import requests
 from django.shortcuts import render
 from .forms import FlightSearchForm
 from .services import FlightService
@@ -22,12 +21,12 @@ def search_flights(request):
             try:
                 flights = flight_service.get_flights(origin, destination, date)
                 if not flights:
-                    error_message = 'No flights found for the selected criteria.'
+                    error_message = 'Nenhum voo encontrado.'
             except Exception as e:
                 logger.error(f"Error fetching flights: {e}")
-                error_message = 'An error occurred while fetching flight data.'
+                error_message = 'Ocorreu um erro ao pesquisar pelos voos.'
         else:
-            error_message = 'Please correct the errors below.'
+            error_message = 'Corrija os erros abaixo.'
     else:
         form = FlightSearchForm()
 

@@ -34,6 +34,7 @@ class FlightAPIClient:
             'forceCongener': 'false',
             'cookies': '_gid%3Dundefined%3B'
         }
+        
         if return_date:
             params['returnDate'] = return_date.strftime('%Y-%m-%d')
 
@@ -43,10 +44,8 @@ class FlightAPIClient:
             params=params,
             timeout=30
         )
-        try:
-            response.raise_for_status()
-        except requests.exceptions.HTTPError as e:
-            print(f"Response content: {response.content}")
-            raise e
+
+        response.raise_for_status()
         data = response.json()
+
         return data
