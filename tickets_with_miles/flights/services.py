@@ -1,6 +1,6 @@
 from .api_client import FlightAPIClient
 from urllib.parse import urlencode
-from datetime import datetime
+from datetime import datetime, date, time
 
 class FlightService:
     def __init__(self):
@@ -29,12 +29,24 @@ class FlightService:
             'adults': 1,
             'children': 0,
             'infants': 0,
+            'searchType': 'g3',
+            'segments': 1,
+            'tripType': 2,
             'originAirport': origin,
             'destinationAirport': destination,
-            'departureDate': departure_date
+            'departureDate': self.date_to_timestamp(departure_date)  # Use the helper method
         }
         base_url = "https://www.smiles.com.br/mfe/emissao-passagem/"
         return f"{base_url}?{urlencode(params)}"
+
+    def date_to_timestamp(self, input_date):
+        """
+        Converts a datetime.date object to a UNIX timestamp.
+        """
+        if not isinstance(input_date, date):
+            raise ValueError("input_date must be a datetime.date instance.")
+        combined_datetime = datetime.combine(input_date, time(15, 0))
+        return int(combined_datetime.timestamp() * 1000)
 
     def extract_flights(self, raw_data, smiles_url):
         """
@@ -54,7 +66,7 @@ class FlightService:
         parsed_flights = []
         for flight in flight_list:
             parsed_flight = self.parse_single_flight(flight, smiles_url)
-            if parsed_flight:
+            if parsed_flight and parsed_flight['miles_cost'] != -1:
                 parsed_flights.append(parsed_flight)
         return parsed_flights
 
@@ -83,7 +95,12 @@ class FlightService:
         return flight.get('airline', {}).get('name')
 
     def get_miles_cost(self, flight):
-        return flight.get('fareList', [{}])[0].get('baseMiles')
+        first_fare = flight.get('fareList', [{}])[0]
+
+        if first_fare.get('type') in {'SMILES', 'SMILES_CLUB'}:
+            return first_fare.get('baseMiles')
+        else:
+            return -1
 
     def get_duration(self, flight):
         return flight.get('duration', {}).get('hours')
@@ -99,7 +116,7 @@ class FlightService:
         return flight.get('departure', {}).get('airport', {}).get('code')
 
     def get_number_of_stops(self, flight):
-        return len(flight.get('fareList', [])) - 1
+        return len(flight.get('legList', [])) - 1
 
     def get_arrival_time(self, flight):
         date_str = flight.get('arrival', {}).get('date')
