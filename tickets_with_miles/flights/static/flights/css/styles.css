@@ -1,0 +1,54 @@
+body {
+    background-color: #f8f9fa;
+    font-family: 'Roboto', sans-serif;
+}
+
+h1, h2 {
+    font-family: 'Roboto', sans-serif;
+}
+
+.card {
+    border-radius: 8px;
+}
+
+.input-group-text {
+    background-color: #ffffff;
+    border-right: none;
+}
+
+.form-control {
+    border-left: none;
+}
+
+.btn-primary {
+    border-radius: 5px;
+}
+
+.flight-card {
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 0 11px rgba(33,33,33,.1);
+    border-left: 5px solid #007bff;
+}
+
+.flight-info > div {
+    margin-right: 20px;
+    font-size: 0.9rem;
+}
+
+.flight-info .departure-time {
+    font-size: 1.2rem;
+}
+
+.flight-info .airline-name {
+    font-weight: bold;
+}
+
+.flight-info .smiles-link a {
+    text-decoration: none;
+    color: #007bff;
+}
+
+.flight-info .smiles-link a:hover {
+    text-decoration: underline;
+}

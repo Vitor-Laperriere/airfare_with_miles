@@ -1,58 +1,112 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Flight Miles Search</title>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            flatpickr("input[type='date']", {
-                minDate: "today",
-                maxDate: new Date().fp_incr(329)
-            });
-        });
-    </script>
-    
-</head>
+{% load static %}
+{% load form_tags %}
 
-<body class="container">
-    <h1 class="mt-5">Search Flights Redeemable with Miles</h1>
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Busca de Voos na Smiles</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+    <!-- Fonte Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+    <!-- Flatpickr CSS via CDN -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <!-- CSS Customizado -->
+    <link rel="stylesheet" href="{% static 'flights/css/styles.css' %}">
+    <!-- Ícones Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
+</head>
+<body>
+<div class="container">
+    <h1 class="mt-5 text-center">Busca de Voos na Smiles</h1>
 
     {% if error_message %}
-        <div class="alert alert-danger">{{ error_message }}</div>
+        <div class="alert alert-danger mt-3">{{ error_message }}</div>
     {% endif %}
 
-    <form method="post" class="mt-4">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit" class="btn btn-primary">Search</button>
-    </form>
+    <!-- Formulário de Busca -->
+    <div class="d-flex justify-content-center mt-4">
+        <div class="card p-4 shadow" style="max-width: 600px; width: 100%;">
+            <form method="post">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="id_origin">Origem</label>
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text"><i class="fas fa-plane-departure"></i></span>
+                        </div>
+                        {{ form.origin|add_class:"form-control" }}
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="id_destination">Destino</label>
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text"><i class="fas fa-plane-arrival"></i></span>
+                        </div>
+                        {{ form.destination|add_class:"form-control" }}
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="id_date">Data</label>
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text"><i class="fas fa-calendar-alt"></i></span>
+                        </div>
+                        {{ form.date|add_class:"form-control" }}
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">Buscar</button>
+            </form>
+        </div>
+    </div>
 
+    <!-- Resultados dos Voos -->
     {% if flights %}
-        <h2 class="mt-5">Available Flights:</h2>
-        <table class="table table-striped">
-            <thead>
-                <tr>
-                    <th>Airline</th>
-                    <th>Departure Time</th>
-                    <th>Arrival Time</th>
-                    <th>Duration (Hours)</th>
-                    <th>Miles Required</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for flight in flights %}
-                    <tr>
-                        <td>{{ flight.airline }}</td>
-                        <td>{{ flight.departure_time }}</td>
-                        <td>{{ flight.arrival_time }}</td>
-                        <td>{{ flight.duration }}h {{ flight.duration_minutes }}m</td>
-                        <td>{{ flight.baseMiles }}</td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+        <h2 class="mt-5">Voos Disponíveis:</h2>
+
+        <!-- Lista de Voos -->
+        <div class="flight-list mt-3">
+            {% for flight in flights %}
+                <div class="flight-card d-flex align-items-center p-3 mb-3">
+                    <div class="flight-info d-flex align-items-center w-100">
+                        <div class="departure-time">
+                            <strong>{{ flight.departure_time|date:"H:i" }}</strong>
+                        </div>
+                        <div class="airline-name ml-4">
+                            {{ flight.airline }}
+                        </div>
+                        <div class="airports ml-4">
+                            {{ flight.departure_airport }} &rarr; {{ flight.arrival_airport }}
+                        </div>
+                        <div class="duration ml-4">
+                            Duração: {{ flight.duration }}h {{ flight.duration_minutes }}m
+                        </div>
+                        <div class="stops ml-4">
+                            Escalas: {{ flight.number_stops }}
+                        </div>
+                        <div class="miles ml-4">
+                            Milhas: {{ flight.miles_cost }}
+                        </div>
+                        <div class="smiles-link ml-auto">
+                            <a href="{{ flight.smiles_url }}" target="_blank">Ver na Smiles</a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
     {% endif %}
+</div>
+
+<!-- jQuery e Bootstrap JS -->
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+<!-- Flatpickr JS via CDN -->
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<!-- Flatpickr Localização em Português via CDN -->
+<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/pt.js"></script>
+<!-- JavaScript Customizado -->
+<script src="{% static 'flights/js/scripts.js' %}"></script>
 </body>
 </html>

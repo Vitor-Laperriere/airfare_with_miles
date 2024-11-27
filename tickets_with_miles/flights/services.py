@@ -1,6 +1,6 @@
 from .api_client import FlightAPIClient
 from urllib.parse import urlencode
-
+from datetime import datetime
 
 class FlightService:
     def __init__(self):
@@ -68,10 +68,10 @@ class FlightService:
                 'miles_cost': self.get_miles_cost(flight),
                 'duration': self.get_duration(flight),
                 'duration_minutes': self.get_duration_minutes(flight),
-                'departure_time': self.get_departure_time(flight),
+                'departure_time': self.get_departure_time(flight).isoformat(),
                 'departure_airport': self.get_departure_airport(flight),
                 'number_stops': self.get_number_of_stops(flight),
-                'arrival_time': self.get_arrival_time(flight),
+                'arrival_time': self.get_arrival_time(flight).isoformat(),
                 'arrival_airport': self.get_arrival_airport(flight),
                 'smiles_url': smiles_url,
             }
@@ -92,7 +92,8 @@ class FlightService:
         return flight.get('duration', {}).get('minutes')
 
     def get_departure_time(self, flight):
-        return flight.get('departure', {}).get('date')
+        date_str = flight.get('departure', {}).get('date')
+        return datetime.fromisoformat(date_str) if date_str else None
 
     def get_departure_airport(self, flight):
         return flight.get('departure', {}).get('airport', {}).get('code')
@@ -101,7 +102,8 @@ class FlightService:
         return len(flight.get('fareList', [])) - 1
 
     def get_arrival_time(self, flight):
-        return flight.get('arrival', {}).get('date')
+        date_str = flight.get('arrival', {}).get('date')
+        return datetime.fromisoformat(date_str) if date_str else None
 
     def get_arrival_airport(self, flight):
         return flight.get('arrival', {}).get('airport', {}).get('code')

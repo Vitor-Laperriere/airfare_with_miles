@@ -23,7 +23,7 @@ def search_flights(request):
                 if not flights:
                     error_message = 'Nenhum voo encontrado.'
             except Exception as e:
-                logger.error(f"Error fetching flights: {e}")
+                logger.error(f"Erro ao buscar voos: {e}")
                 error_message = 'Ocorreu um erro ao pesquisar pelos voos.'
         else:
             error_message = 'Corrija os erros abaixo.'
