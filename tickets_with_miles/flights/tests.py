@@ -22,8 +22,8 @@ class FlightServiceTestCase(TestCase):
                             "departure": {"date": "2025-03-26T16:40:00"},
                             "arrival": {"date": "2025-03-27T11:05:00"},
                             "stops": 1,
-                            "departureAirport": {"code": "GIG"},
-                            "arrivalAirport": {"code": "MIL"}
+                            "departure": {"airport": {"code": "GIG"}},
+                            "arrival": {"airport": {"code": "MIL"}}
                         }
                     ]
                 }
