@@ -6,16 +6,15 @@
 <head>
     <meta charset="UTF-8">
     <title>Busca de Voos na Smiles</title>
-    <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
-    <!-- Fonte Google Fonts -->
+
     <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
-    <!-- Flatpickr CSS via CDN -->
+
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-    <!-- CSS Customizado -->
-    <link rel="stylesheet" href="{% static 'flights/css/styles.css' %}">
-    <!-- Ícones Font Awesome -->
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
+
+    <link rel="stylesheet" href="{% static 'flights/css/styles.css' %}">
 </head>
 <body>
 <div class="container">
@@ -25,7 +24,7 @@
         <div class="alert alert-danger mt-3">{{ error_message }}</div>
     {% endif %}
 
-    <!-- Formulário de Busca -->
+    <!-- Search form -->
     <div class="d-flex justify-content-center mt-4">
         <div class="card p-4 shadow" style="max-width: 600px; width: 100%;">
             <form method="post">
@@ -62,11 +61,11 @@
         </div>
     </div>
 
-    <!-- Resultados dos Voos -->
+    <!-- Flight results -->
     {% if flights %}
         <h2 class="mt-5">Voos Disponíveis:</h2>
 
-        <!-- Lista de Voos -->
+        <!-- Flights list -->
         <div class="flight-list mt-3">
             {% for flight in flights %}
                 <div class="flight-card d-flex align-items-center p-3 mb-3">
@@ -81,10 +80,10 @@
                             {{ flight.departure_airport }} &rarr; {{ flight.arrival_airport }}
                         </div>
                         <div class="duration ml-4">
-                            Duração: {{ flight.duration }}h {{ flight.duration_minutes }}m
+                            Duração: {{ flight.duration_hours }}h {{ flight.duration_minutes }}m
                         </div>
                         <div class="stops ml-4">
-                            Conexões: {{ flight.number_stops }}
+                            Conexões: {{ flight.number_of_stops }}
                         </div>
                         <div class="miles ml-4">
                             Milhas: {{ flight.miles_cost }}
@@ -99,14 +98,10 @@
     {% endif %}
 </div>
 
-<!-- jQuery e Bootstrap JS -->
 <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
-<!-- Flatpickr JS via CDN -->
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-<!-- Flatpickr Localização em Português via CDN -->
 <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/pt.js"></script>
-<!-- JavaScript Customizado -->
 <script src="{% static 'flights/js/scripts.js' %}"></script>
 </body>
 </html>
