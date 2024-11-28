@@ -19,11 +19,11 @@ class FlightServiceTestCase(TestCase):
                             "airline": {"name": "TAP"},
                             "duration": {"hours": 14, "minutes": 25},
                             "fareList": [{"miles": 215000, "type": "SMILES"}],
-                            "departure": {"date": "2025-03-26T16:40:00"},
-                            "arrival": {"date": "2025-03-27T11:05:00"},
+                            "departure": {"date": "2025-03-26T16:40:00",
+                                          "airport": {"code": "GIG"}},
+                            "arrival": {"date": "2025-03-27T11:05:00",
+                                        "airport": {"code": "MIL"}},
                             "stops": 1,
-                            "departure": {"airport": {"code": "GIG"}},
-                            "arrival": {"airport": {"code": "MIL"}}
                         }
                     ]
                 }
