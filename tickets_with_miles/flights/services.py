@@ -95,12 +95,13 @@ class FlightService:
         return flight.get('airline', {}).get('name')
 
     def get_miles_cost(self, flight):
-        first_fare = flight.get('fareList', [{}])[0]
-
-        if first_fare.get('type') in {'SMILES', 'SMILES_CLUB'}:
-            return first_fare.get('baseMiles')
-        else:
-            return -1
+        miles_prices = [
+            fare.get('miles')
+            for fare in flight.get('fareList', [])
+            if fare.get('type') in {'SMILES', 'SMILES_CLUB'} and fare.get('miles', 0) > 0
+        ]
+        
+        return min(miles_prices, default=-1)
 
     def get_duration(self, flight):
         return flight.get('duration', {}).get('hours')
@@ -116,7 +117,7 @@ class FlightService:
         return flight.get('departure', {}).get('airport', {}).get('code')
 
     def get_number_of_stops(self, flight):
-        return len(flight.get('legList', [])) - 1
+        return flight.get('stops')
 
     def get_arrival_time(self, flight):
         date_str = flight.get('arrival', {}).get('date')
