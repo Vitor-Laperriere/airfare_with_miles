@@ -5,7 +5,7 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>Busca de Voos na Smiles</title>
+    <title>Buscador de Voos - Smiles</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
 
     <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
@@ -15,13 +15,19 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
 
     <link rel="stylesheet" href="{% static 'flights/css/styles.css' %}">
+
+    <link rel="icon" type="image/png" href="{% static 'flights/images/favicon.png' %}">
 </head>
 <body>
 <div class="container">
-    <h1 class="mt-5 text-center">Busca de Voos na Smiles</h1>
+    <h1 class="mt-5 text-center">Buscador de Voos - Smiles</h1>
 
-    {% if error_message %}
-        <div class="alert alert-danger mt-3">{{ error_message }}</div>
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-danger mt-3">
+                {{ message }}
+            </div>
+        {% endfor %}
     {% endif %}
 
     <!-- Search form -->
@@ -56,10 +62,19 @@
                         {{ form.date|add_class:"form-control" }}
                     </div>
                 </div>
+                <div class="form-group">
+                    <label for="id_flexibility">Flexibilidade</label>
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text"><i class="fas fa-exchange-alt"></i></span>
+                        </div>
+                        {{ form.flexibility|add_class:"form-control" }}
+                    </div>
+                </div>
                 <button type="submit" class="btn btn-primary btn-block">Buscar</button>
             </form>
         </div>
-    </div>
+    </div>    
 
     <!-- Flight results -->
     {% if flights %}
@@ -70,8 +85,11 @@
             {% for flight in flights %}
                 <div class="flight-card d-flex align-items-center p-3 mb-3">
                     <div class="flight-info d-flex align-items-center w-100">
-                        <div class="departure-time">
-                            <strong>{{ flight.departure_time|date:"H:i" }}</strong>
+                        <div class="flight-date">
+                            <strong>{{ flight.departure_time|to_datetime|date:"d/m/Y" }}</strong>
+                        </div>
+                        <div class="departure-time ml-4">
+                            <strong>{{ flight.departure_time|to_datetime|date:"H:i" }}</strong>
                         </div>
                         <div class="airline-name ml-4">
                             {{ flight.airline }}
