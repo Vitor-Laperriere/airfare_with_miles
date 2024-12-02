@@ -1,6 +1,7 @@
-from datetime import datetime, date, time
+from datetime import datetime, date, time, timedelta
 from typing import List, Dict, Any, Optional
 from urllib.parse import urlencode
+import asyncio
 
 from .api_client import FlightAPIClient
 
@@ -17,43 +18,89 @@ class FlightService:
     DEFAULT_TRIP_TYPE = 2
     DEFAULT_DEPARTURE_TIME_HOUR = 15  # 3:00 PM
 
-    def __init__(self, client: FlightAPIClient = None):
+    def __init__(self, client: Optional[FlightAPIClient] = None):
         """
         Initialize the FlightService with a FlightAPIClient instance.
         """
         self.client = client or FlightAPIClient()
 
-    def get_flights(self, origin: str, destination: str, departure_date: date) -> List[Dict[str, Any]]:
+    def get_flights(
+        self,
+        origin: str,
+        destination: str,
+        departure_date: date,
+        flexibility: int,
+    ) -> List[Dict[str, Any]]:
         """
-        Fetches and processes flight data for the given parameters.
+        Fetches and processes flight data for the given parameters using synchronous calls.
 
         Args:
             origin: The IATA code of the origin airport.
             destination: The IATA code of the destination airport.
             departure_date: The date of departure.
+            flexibility: Number of days with forward flexibility.
 
         Returns:
             A list of dictionaries containing flight information.
         """
-        raw_data = self.fetch_flight_data(origin, destination, departure_date)
-        smiles_url = self.generate_smiles_url(origin, destination, departure_date)
-        return self.extract_flights(raw_data, smiles_url)
+        # Run the asynchronous get_flights_internal in an event loop
+        return asyncio.run(
+            self.get_flights_internal(origin, destination, departure_date, flexibility)
+        )
 
-    def fetch_flight_data(self, origin: str, destination: str, departure_date: date) -> Dict[str, Any]:
+    async def get_flights_internal(
+        self,
+        origin: str,
+        destination: str,
+        departure_date: date,
+        flexibility: int,
+    ) -> List[Dict[str, Any]]:
         """
-        Fetches raw flight data from the API client.
+        Asynchronous internal method to fetch and process flight data.
 
         Args:
             origin: The IATA code of the origin airport.
             destination: The IATA code of the destination airport.
             departure_date: The date of departure.
+            flexibility: Number of days with forward flexibility.
 
         Returns:
-            A dictionary containing raw flight data.
+            A list of dictionaries containing flight information.
         """
-        return self.client.search_flights(origin, destination, departure_date)
+        flexibility = max(flexibility, 1)
+        searches = []
+        for delta_days in range(flexibility):
+            search_date = departure_date + timedelta(days=delta_days)
+            searches.append({
+                'origin': origin,
+                'destination': destination,
+                'departure_date': search_date,
+                'adults': self.DEFAULT_ADULTS,
+                'children': self.DEFAULT_CHILDREN,
+                'infants': self.DEFAULT_INFANTS,
+            })
 
-    def generate_smiles_url(self, origin: str, destination: str, departure_date: date) -> str:
+        raw_data_list = await self.client.search_flights_bulk(searches)
+
+        flights = []
+        for search_params, raw_data in zip(searches, raw_data_list):
+            smiles_url = self.generate_smiles_url(
+                search_params['origin'],
+                search_params['destination'],
+                search_params['departure_date']
+            )
+            extracted_flights = self.extract_flights(raw_data, smiles_url)
+            flights.extend(extracted_flights)
+
+        sorted_flights_list = sorted(flights, key=lambda x: x['miles_cost'])
+        return sorted_flights_list
+
+    def generate_smiles_url(
+        self,
+        origin: str,
+        destination: str,
+        departure_date: date
+    ) -> str:
         """
         Constructs the Smiles URL with the given parameters.
 
@@ -75,7 +122,7 @@ class FlightService:
             'tripType': self.DEFAULT_TRIP_TYPE,
             'originAirport': origin,
             'destinationAirport': destination,
-            'departureDate': self.date_to_timestamp(departure_date)
+            'departureDate': self.date_to_timestamp(departure_date),
         }
         return f"{self.SMILES_URL_BASE}?{urlencode(params)}"
 
@@ -95,7 +142,11 @@ class FlightService:
         )
         return int(combined_datetime.timestamp() * 1000)
 
-    def extract_flights(self, raw_data: Dict[str, Any], smiles_url: str) -> List[Dict[str, Any]]:
+    def extract_flights(
+        self,
+        raw_data: Dict[str, Any],
+        smiles_url: str
+    ) -> List[Dict[str, Any]]:
         """
         Extracts flight information from raw API data.
 
@@ -113,7 +164,11 @@ class FlightService:
             flights.extend(self.parse_flights(flight_list, smiles_url))
         return flights
 
-    def parse_flights(self, flight_list: List[Dict[str, Any]], smiles_url: str) -> List[Dict[str, Any]]:
+    def parse_flights(
+        self,
+        flight_list: List[Dict[str, Any]],
+        smiles_url: str
+    ) -> List[Dict[str, Any]]:
         """
         Parses a list of flights and extracts relevant information.
 
@@ -131,7 +186,11 @@ class FlightService:
                 parsed_flights.append(parsed_flight)
         return parsed_flights
 
-    def parse_single_flight(self, flight: Dict[str, Any], smiles_url: str) -> Optional[Dict[str, Any]]:
+    def parse_single_flight(
+        self,
+        flight: Dict[str, Any],
+        smiles_url: str
+    ) -> Optional[Dict[str, Any]]:
         """
         Parses a single flight and extracts relevant information.
 
@@ -159,6 +218,7 @@ class FlightService:
                 'smiles_url': smiles_url,
             }
         except (KeyError, IndexError, TypeError, ValueError):
+            # Handle parsing errors gracefully
             return None
 
     @staticmethod
