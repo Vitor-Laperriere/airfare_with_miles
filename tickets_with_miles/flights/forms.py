@@ -66,7 +66,7 @@ class FlightSearchForm(forms.Form):
         """
         destination = self.cleaned_data['destination'].upper()
         if not Airport.objects.filter(iata_code=destination).exists():
-            raise ValidationError(self.ERROR_MESSAGES['detination'])
+            raise ValidationError(self.ERROR_MESSAGES['destination'])
         return destination
 
     def clean_date(self) -> datetime.date:
