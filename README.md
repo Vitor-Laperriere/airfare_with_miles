@@ -1,11 +1,9 @@
 # Buscador de Voos com Milhas na Smiles
 
 ## Integrantes do Grupo
-> Isso aqui pode ser um problema. Será que vamos ter que fazer 2 repos? 
-- [Nome 1]
-- [Nome 2]
-- [Nome 3]
-- [Nome 4]
+- Frederico Dolher Souza Baker (2021031513)
+- Daniel Oliveira Barbosa (2020006450)
+- Vitor Laperriere de Faria (2024422890)
 
 ## Descrição do Sistema
 Esta é uma aplicação que permite a pesquisa de voos da plataforma Smiles com flexibilidade de datas. Ao fornecer os seguintes parâmetros:
