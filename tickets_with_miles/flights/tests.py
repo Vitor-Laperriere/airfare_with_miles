@@ -1,46 +1,19 @@
-from django.test import TestCase
-from unittest.mock import patch
+from unittest import TestCase
 from datetime import date
 from flights.services import FlightService
 
-class FlightServiceTestCase(TestCase):
-
-    @patch('flights.services.FlightAPIClient.search_flights')
-    def test_get_flights(self, mock_search_flights):
+class FlightServiceSimpleFunctionTest(TestCase):
+    def test_generate_smiles_url(self):
         """
-        Test the get_flights method of the FlightService class.
+        Test the generate_smiles_url function.
         """
-        
-        mock_response = {
-            "requestedFlightSegmentList": [
-                {
-                    "flightList": [
-                        {
-                            "airline": {"name": "TAP"},
-                            "duration": {"hours": 14, "minutes": 25},
-                            "fareList": [{"miles": 215000, "type": "SMILES"}],
-                            "departure": {"date": "2025-03-26T16:40:00",
-                                          "airport": {"code": "GIG"}},
-                            "arrival": {"date": "2025-03-27T11:05:00",
-                                        "airport": {"code": "MIL"}},
-                            "stops": 1,
-                        }
-                    ]
-                }
-            ]
-        }
-        mock_search_flights.return_value = mock_response
+        service = FlightService()
+        origin = "GIG"
+        destination = "MIL"
+        departure_date = date(2025, 3, 26)
 
-        flight_service = FlightService()
-        flights = flight_service.get_flights("GIG", "MIL", date(2025, 3, 26))
+        url = service.generate_smiles_url(origin, destination, departure_date)
 
-        self.assertEqual(len(flights), 1)
-        self.assertEqual(flights[0]['airline'], 'TAP')
-        self.assertEqual(flights[0]['duration_hours'], 14)
-        self.assertEqual(flights[0]['duration_minutes'], 25)
-        self.assertEqual(flights[0]['miles_cost'], 215000)
-        self.assertEqual(flights[0]['departure_time'], "2025-03-26T16:40:00")
-        self.assertEqual(flights[0]['arrival_time'], "2025-03-27T11:05:00")
-        self.assertEqual(flights[0]['number_of_stops'], 1)
-        self.assertEqual(flights[0]['departure_airport'], "GIG")
-        self.assertEqual(flights[0]['arrival_airport'], "MIL")
+        self.assertIn("originAirport=GIG", url)
+        self.assertIn("destinationAirport=MIL", url)
+        self.assertIn("departureDate=1743001200000", url)
